@@ -1,0 +1,53 @@
+<!-- index.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Frontend</title>
+</head>
+<body>
+    <h1>Items</h1>
+    <ul id="itemList"></ul>
+    <form id="addItemForm">
+        <input type="text" id="nameInput" placeholder="Name">
+        <input type="text" id="descriptionInput" placeholder="Description">
+        <button type="submit">Add Item</button>
+    </form>
+
+    <script>
+        async function fetchItems() {
+            const response = await fetch('/api/items');
+            const items = await response.json();
+            const itemList = document.getElementById('itemList');
+            itemList.innerHTML = '';
+            items.forEach(item => {
+                const li = document.createElement('li');
+                li.textContent = `${item.name}: ${item.description}`;
+                itemList.appendChild(li);
+            });
+        }
+
+        async function addItem(event) {
+            event.preventDefault();
+            const name = document.getElementById('nameInput').value;
+            const description = document.getElementById('descriptionInput').value;
+            const response = await fetch('/api/items', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ name, description })
+            });
+            if (response.ok) {
+                fetchItems();
+            }
+        }
+
+        document.getElementById('addItemForm').addEventListener('submit', addItem);
+
+        fetchItems();
+    </script>
+</body>
+</html>
